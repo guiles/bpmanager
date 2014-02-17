@@ -21,7 +21,7 @@ function executeNext(e) {
 //Prototipo BPMANAGER - Parecido al patron Observer
 function BPManager(){ 
 this.currentPrimitiveTasks = []; //Array de las tareas a realizar cuando se ejecuta el Manager
-this.primitiveTasks = ['FillInputTask','SelectOptionTask']; //Un array de tareas que puede realizar
+this.primitiveTasks = ['FillInputTask','SelectOptionTask','TextAreaTask']; //Un array de tareas que puede realizar
 }
 
 //El metodo initialize agrega al array de tareas primitivas
@@ -32,8 +32,8 @@ BPManager.prototype.initialize =  function(){
 BPManager.prototype.getNextTask = function(){ //Me trae la proxima tarea pendiente
     for (var i=0;i < this.currentPrimitiveTasks.length;i++){
     
-    console.debug("estado de la tarea:"); 
-    console.debug(this.currentPrimitiveTasks[i].getState());
+//    console.debug("estado de la tarea:"); 
+//    console.debug(this.currentPrimitiveTasks[i].getState());
     
         if(this.currentPrimitiveTasks[i].getState() == 0 ) return this.currentPrimitiveTasks[i];
     }
@@ -57,6 +57,11 @@ BPManager.prototype.addPrimitiveTask =  function(aId,aPrimitiveTaskType,xPath,va
 		  this.subscribe( this.createSelectOptionTask(aId,xPath,value,msg) );
 
 		  break;
+		case 'TextAreaTask':
+
+		  this.subscribe( this.createSelectOptionTask(aId,xPath,value,msg) );
+
+		  break;  
 		default:
 		  return false;
 		}
@@ -73,6 +78,11 @@ return  new FillInputTask(aId,xPath,value,aMsg);
 BPManager.prototype.createSelectOptionTask = function(aId,xPath,value,aMsg){
 return new SelectOptionTask(aId,xPath,value,aMsg);
 }
+
+BPManager.prototype.createTextAreaTask = function(aId,xPath,value,aMsg){
+return new TextAreaTask(aId,xPath,value,aMsg);
+}
+
 
 BPManager.prototype.subscribe = function(aPrimitiveTask){ //Este metodo por ahora solo agrega el objeto
 this.currentPrimitiveTasks.push(aPrimitiveTask);
@@ -92,9 +102,9 @@ this.primitiveTasks=[];
 BPManager.prototype.execute = function(){
 	for (var i=0;i < this.currentPrimitiveTasks.length;i++){
 
-	//console.debug("<-----");
-	//console.debug(this.currentPrimitiveTasks[i]);
-	//console.debug("----->");
+	console.debug("<-----");
+	console.debug(this.currentPrimitiveTasks[i]);
+	console.debug("----->");
 
 	this.currentPrimitiveTasks[i].execute();
 	}

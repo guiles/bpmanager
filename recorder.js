@@ -11,6 +11,40 @@ onFocus: select, text, textarea
 onSelect: text, textarea
 */
 
+//Funciones adicionales para sacar el xPath abolsuto
+function createXPathFromElement(elm) { 
+    var allNodes = document.getElementsByTagName('*'); 
+    for (segs = []; elm && elm.nodeType == 1; elm = elm.parentNode) 
+    { 
+        if (elm.hasAttribute('id')) { 
+                var uniqueIdCount = 0; 
+                for (var n=0;n < allNodes.length;n++) { 
+                    if (allNodes[n].hasAttribute('id') && allNodes[n].id == elm.id) uniqueIdCount++; 
+                    if (uniqueIdCount > 1) break; 
+                }; 
+                if ( uniqueIdCount == 1) { 
+                    segs.unshift('id("' + elm.getAttribute('id') + '")'); 
+                    return segs.join('/'); 
+                } else { 
+                    segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]'); 
+                } 
+        } else if (elm.hasAttribute('class')) { 
+            segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]'); 
+        } else { 
+            for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) { 
+                if (sib.localName == elm.localName)  i++; }; 
+                segs.unshift(elm.localName.toLowerCase() + '[' + i + ']'); 
+        }; 
+    }; 
+    return segs.length ? '/' + segs.join('/') : null; 
+}; 
+
+function lookupElementByXPath(path) { 
+    var evaluator = new XPathEvaluator(); 
+    var result = evaluator.evaluate(path, document.documentElement, null,XPathResult.FIRST_ORDERED_NODE_TYPE, null); 
+    return  result.singleNodeValue; 
+} 
+
 //document.addEventListener("change", registroEventoInput , false); 
 //document.addEventListener("click", registroEventoClic , false); 
 
@@ -24,12 +58,16 @@ var el_value = event.target.value;
 if(el_id){
 var sxPath = '//*[@id="'+el_id+'"]';
 }else{ //Si no tiene ID tengo que ver la manera de sacar el absoluto
-	//console.debug("no tiene id, saco el absoluto");
+	
+	console.debug("no tiene id, saco el absoluto, uso el ejemplo de stack");
+	var sxPath = createXPathFromElement(event.target) ;
+	console.debug(sxPath);
 }
 
 
 //Guardo en el JSON compartido que sirve para el recorder.
 //Diferencio los tipos de nodos, ahi le envio el tipo de tarea que recolecto.
+//Me parece que seria mejor que tome el nombre del elemento y no tengo que usar el switch
 switch(event.target.nodeName)
 {
 		case 'SELECT':
@@ -57,6 +95,19 @@ switch(event.target.nodeName)
 			console.debug(obj);		  
 
 		  break;
+		  	case 'TEXTAREA':
+		
+			var obj = new Object();
+			obj.type = "TextAreaTask";
+			obj.xPath  = sxPath;
+			obj.value = el_value;
+			
+			JSON_RECORDER.push(obj);		 
+			
+			console.debug("Evento TextArea");		  
+			console.debug(obj);		  
+
+		  break;
 		default:
 
 		  break;
@@ -77,8 +128,11 @@ var el_value = event.target.value;
 	var sxPath = '//*[@id="'+el_id+'"]';
 
 	}else{
+	
+	console.debug("no tiene id, saco el absoluto, uso el ejemplo de stack");
+	var sxPath = createXPathFromElement(event.target) ;
+	console.debug(sxPath);
 
-		console.debug("no tiene id, saco el absoluto");
 	}
 
 }
@@ -174,7 +228,7 @@ console.debug("Init");
 
 	function PlayProcedure(){
 		console.log("Ejecuta estas tareas");
-		//console.debug(JSON_RECORDER);
+		console.debug(JSON_RECORDER);
 
 		//Clear Tasks
 		BPMN.clearPrimitiveTasks();

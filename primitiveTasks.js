@@ -51,3 +51,10 @@ function SelectOptionTask(id,xPath,value){
     this.msg = "SelectOptionTask"
 }
 SelectOptionTask.prototype = new PrimitiveTask();
+
+//Herencia --> PrimitiveTask
+function TextAreaTask(id,xPath,value){
+    PrimitiveTask.call(this,id,xPath,value);
+    this.msg = "SelectOptionTask"
+}
+TextAreaTask.prototype = new PrimitiveTask();
