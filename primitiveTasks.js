@@ -45,6 +45,45 @@ function FillInputTask(id,xPath,value){
 }
 FillInputTask.prototype = new PrimitiveTask();
 
+//Herencia --> PrimitiveTask : En este caso sobreescribo el metodo ejecutar porque tiene distinto comportamiento
+function CheckBoxTask(id,xPath,value){
+    PrimitiveTask.call(this,id,xPath,value);
+    this.msg = "CheckBoxTask"
+
+}
+CheckBoxTask.prototype = new PrimitiveTask();
+
+CheckBoxTask.prototype.execute = function(){
+
+var iterator = document.evaluate(this.xPath,document,null,0,null);
+var node = iterator.iterateNext();
+    node.checked= true;
+  
+    this.finalizo();
+
+    return node;
+}
+
+//Herencia --> PrimitiveTask : En este caso sobreescribo el metodo ejecutar porque tiene distinto comportamiento
+function RadioTask(id,xPath,value){
+    PrimitiveTask.call(this,id,xPath,value);
+    this.msg = "RadioTask"
+
+}
+RadioTask.prototype = new PrimitiveTask();
+
+RadioTask.prototype.execute = function(){
+
+var iterator = document.evaluate(this.xPath,document,null,0,null);
+var node = iterator.iterateNext();
+    node.checked= true;
+  
+    this.finalizo();
+
+    return node;
+}
+
+
 //Herencia --> PrimitiveTask
 function SelectOptionTask(id,xPath,value){
     PrimitiveTask.call(this,id,xPath,value);
@@ -55,6 +94,7 @@ SelectOptionTask.prototype = new PrimitiveTask();
 //Herencia --> PrimitiveTask
 function TextAreaTask(id,xPath,value){
     PrimitiveTask.call(this,id,xPath,value);
-    this.msg = "SelectOptionTask"
+    this.msg = "TextAreaTask"
 }
 TextAreaTask.prototype = new PrimitiveTask();
+

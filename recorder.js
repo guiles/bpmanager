@@ -1,8 +1,6 @@
 //recorder.js
-
 var JSON_RECORDER = new Array(); //Array de Objetos, variable global para guardar el JSON
 var BPMN = new BPManager(); //Deberia ser Singleton y variable global
-
 /*
 Eventos que voy a tratar:
 onChange: select, text, textarea
@@ -45,9 +43,6 @@ function lookupElementByXPath(path) {
     return  result.singleNodeValue; 
 } 
 
-//document.addEventListener("change", registroEventoInput , false); 
-//document.addEventListener("click", registroEventoClic , false); 
-
 //Listener de eventos cuando cambia el foco, recolecta datos relacionados.
 function registroEventoChange(event){
 
@@ -83,12 +78,30 @@ switch(event.target.nodeName)
 
 		  break;
 		case 'INPUT':
+		//temporal para ver si funciona
+
+		if(event.target.type=='radio'){ 
+
+			var obj = new Object();
+			obj.type = "RadioTask";
+			obj.xPath  = sxPath;
+			obj.value = el_value;
 		
+		 }else if(event.target.type=='checkbox'){
+			var obj = new Object();
+			obj.type = "CheckBoxTask";
+			obj.xPath  = sxPath;
+			obj.value = el_value;
+			
+			}else{
 			var obj = new Object();
 			obj.type = "FillInputTask";
 			obj.xPath  = sxPath;
 			obj.value = el_value;
 			
+			}
+
+
 			JSON_RECORDER.push(obj);		 
 			
 			console.debug("Evento INPUT");		  
@@ -118,7 +131,6 @@ switch(event.target.nodeName)
 function registroEventoClic(event){
 
 console.debug("Registro evento:"+event.target);
-console.debug(event.target);
 
 var el_id = event.target.id;
 var el_value = event.target.value;
@@ -199,12 +211,6 @@ iPlay_recorder.addEventListener("click",PlayProcedure, false);
 //END DIV al final del HTML
 
 console.debug("Init");
-//Agrego el evento al boton
-//var record_button = document.getElementById("start_record");
-//record_button.addEventListener("click",RecordManager, false); 
-
-//var record_button = document.getElementById("stop_record");
-//record_button.addEventListener("click",RecordManager, false); 
 
 	function RecordManager(e){ //Esto deberia estar dentro del plugin, y desacoplado de la pagina
 		
@@ -223,13 +229,9 @@ console.debug("Init");
 
 
 //Play Procedure
-//var play_procedure_button = document.getElementById("play_procedure");
-//play_procedure_button.addEventListener("click",PlayProcedure, false); 
-
 	function PlayProcedure(){
 		console.log("Ejecuta estas tareas");
 		console.debug(JSON_RECORDER);
-
 		//Clear Tasks
 		BPMN.clearPrimitiveTasks();
 		for (var i=0;i < JSON_RECORDER.length;i++){
@@ -237,12 +239,6 @@ console.debug("Init");
 		BPMN.addPrimitiveTask(i,JSON_RECORDER[i].type,JSON_RECORDER[i].xPath,JSON_RECORDER[i].value );
 		};
 
-	//Cada vez que grabo, tengo que resetear el array
-
-	//Ejecuta lo grabado
-//	console.debug(BPMN);
-	BPMN.start();
-
+		BPMN.start();
 	}
-
 }
