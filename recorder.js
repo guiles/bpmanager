@@ -43,6 +43,9 @@ function lookupElementByXPath(path) {
     return  result.singleNodeValue; 
 } 
 
+//document.addEventListener("change", registroEventoInput , false); 
+//document.addEventListener("click", registroEventoClic , false); 
+
 //Listener de eventos cuando cambia el foco, recolecta datos relacionados.
 function registroEventoChange(event){
 
@@ -131,6 +134,7 @@ switch(event.target.nodeName)
 function registroEventoClic(event){
 
 console.debug("Registro evento:"+event.target);
+console.debug(event.target);
 
 var el_id = event.target.id;
 var el_value = event.target.value;
@@ -171,7 +175,8 @@ window.onload = function(){
 	iStop_recorder.setAttribute('type','button');
 	iStop_recorder.setAttribute('value','Stop');
 	iStop_recorder.setAttribute('id','stop_record');
-
+	iStop_recorder.setAttribute('disabled',true);
+	
 	var iPlay_recorder = document.createElement("input");
 	iPlay_recorder.setAttribute('type','button');
 	iPlay_recorder.setAttribute('value','Play');
@@ -211,6 +216,12 @@ iPlay_recorder.addEventListener("click",PlayProcedure, false);
 //END DIV al final del HTML
 
 console.debug("Init");
+//Agrego el evento al boton
+//var record_button = document.getElementById("start_record");
+//record_button.addEventListener("click",RecordManager, false); 
+
+//var record_button = document.getElementById("stop_record");
+//record_button.addEventListener("click",RecordManager, false); 
 
 	function RecordManager(e){ //Esto deberia estar dentro del plugin, y desacoplado de la pagina
 		
@@ -218,20 +229,34 @@ console.debug("Init");
 		console.debug("empieza a grabar");
 		document.addEventListener("change", registroEventoChange , false); 
 		document.addEventListener("click", registroEventoClic , false); 
+
+		var start_record = document.getElementById('start_record');
+		start_record.disabled = true;
+		var stop_record = document.getElementById('stop_record');
+		stop_record.disabled = false;
+
 		}
 		if(e.target.id=="stop_record"){
 		console.debug("termino de grabar");
 		document.removeEventListener("change", registroEventoChange , false); 
 		document.removeEventListener("click", registroEventoClic , false); 	
-		
+
+		var start_record = document.getElementById('start_record');
+		start_record.disabled = false;
+		var stop_record = document.getElementById('stop_record');
+		stop_record.disabled = true;
 		}
 	}
 
 
 //Play Procedure
+//var play_procedure_button = document.getElementById("play_procedure");
+//play_procedure_button.addEventListener("click",PlayProcedure, false); 
+
 	function PlayProcedure(){
 		console.log("Ejecuta estas tareas");
 		console.debug(JSON_RECORDER);
+
 		//Clear Tasks
 		BPMN.clearPrimitiveTasks();
 		for (var i=0;i < JSON_RECORDER.length;i++){
@@ -240,5 +265,7 @@ console.debug("Init");
 		};
 
 		BPMN.start();
+
 	}
+
 }
