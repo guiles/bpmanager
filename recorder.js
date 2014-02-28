@@ -48,6 +48,10 @@ function lookupElementByXPath(path) {
 
 //Listener de eventos cuando cambia el foco, recolecta datos relacionados.
 function registroEventoChange(event){
+//Temporal, para asignarle si es tarea automatica, deberia ir en la consola
+var tipo = 0;
+
+if( confirm("Tipo de tarea Automatica") ) tipo = 1;
 
 var el_id = event.target.id;
 var el_value = event.target.value;
@@ -73,6 +77,7 @@ switch(event.target.nodeName)
 			obj.type = "SelectOptionTask";
 			obj.xPath  = sxPath;
 			obj.value = el_value;
+			obj.tipo = tipo;
 
 			JSON_RECORDER.push(obj);		 
 		    
@@ -89,18 +94,22 @@ switch(event.target.nodeName)
 			obj.type = "RadioTask";
 			obj.xPath  = sxPath;
 			obj.value = el_value;
-		
+			obj.tipo = tipo;
+
 		 }else if(event.target.type=='checkbox'){
 			var obj = new Object();
 			obj.type = "CheckBoxTask";
 			obj.xPath  = sxPath;
 			obj.value = el_value;
+			obj.tipo = tipo;
+
 			
 			}else{
 			var obj = new Object();
 			obj.type = "FillInputTask";
 			obj.xPath  = sxPath;
 			obj.value = el_value;
+			obj.tipo = tipo;
 			
 			}
 
@@ -117,6 +126,7 @@ switch(event.target.nodeName)
 			obj.type = "TextAreaTask";
 			obj.xPath  = sxPath;
 			obj.value = el_value;
+			obj.tipo = tipo;
 			
 			JSON_RECORDER.push(obj);		 
 			
@@ -261,11 +271,10 @@ console.debug("Init");
 		BPMN.clearPrimitiveTasks();
 		for (var i=0;i < JSON_RECORDER.length;i++){
 		//Tengo que saber que tipo de elemento para saber que agregar
-		BPMN.addPrimitiveTask(i,JSON_RECORDER[i].type,JSON_RECORDER[i].xPath,JSON_RECORDER[i].value );
-		};
+		BPMN.addPrimitiveTask(i,JSON_RECORDER[i].type,JSON_RECORDER[i].xPath,
+			JSON_RECORDER[i].value,JSON_RECORDER[i].tipo);
 
 		BPMN.start();
-
+		}
 	}
-
 }

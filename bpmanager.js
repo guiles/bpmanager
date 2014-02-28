@@ -39,35 +39,35 @@ BPManager.prototype.getNextTask = function(){ //Me trae la proxima tarea pendien
 
 //Este metodo lo que haria es instanciar la clase que corresponde y lo agrega al listado de tareas que va a realizar 
 //el manager una vez que le diga execute.
-BPManager.prototype.addPrimitiveTask =  function(aId,aPrimitiveTaskType,xPath,value,msg){
+BPManager.prototype.addPrimitiveTask =  function(aId,aPrimitiveTaskType,xPath,value,msg,tipo){
 
 		//Instancia y agrega al array de tareas
 		switch(aPrimitiveTaskType)
 		{
 		case 'FillInputTask':
 		  
-		  this.subscribe( this.createFillInputTask(aId,xPath,value,msg) );
+		  this.subscribe( this.createFillInputTask(aId,xPath,value,msg,tipo) );
 		  
 		  break;
 		case 'SelectOptionTask':
 
-		  this.subscribe( this.createSelectOptionTask(aId,xPath,value,msg) );
+		  this.subscribe( this.createSelectOptionTask(aId,xPath,value,msg,tipo) );
 
 		  break;
 		case 'TextAreaTask':
 
-		  this.subscribe( this.createSelectOptionTask(aId,xPath,value,msg) );
+		  this.subscribe( this.createTextAreaTask(aId,xPath,value,msg,tipo) );
 
 		  break;  
 
 		 case 'CheckBoxTask':
 
-		  this.subscribe( this.createCheckBoxTask(aId,xPath,value,msg) );
+		  this.subscribe( this.createCheckBoxTask(aId,xPath,value,msg,tipo) );
 
 		  break;   
 		  case 'RadioTask':
 
-		  this.subscribe( this.createRadioTask(aId,xPath,value,msg) );
+		  this.subscribe( this.createRadioTask(aId,xPath,value,msg,tipo) );
 
 		  break; 
 		  
@@ -77,26 +77,26 @@ BPManager.prototype.addPrimitiveTask =  function(aId,aPrimitiveTaskType,xPath,va
 
 }
 
-BPManager.prototype.createFillInputTask = function(aId,xPath,value,aMsg){
+BPManager.prototype.createFillInputTask = function(aId,xPath,value,aMsg,aTipo){
 
-return  new FillInputTask(aId,xPath,value,aMsg);
+return  new FillInputTask(aId,xPath,value,aMsg,aTipo);
 
 }
 
-BPManager.prototype.createSelectOptionTask = function(aId,xPath,value,aMsg){
-return new SelectOptionTask(aId,xPath,value,aMsg);
+BPManager.prototype.createSelectOptionTask = function(aId,xPath,value,aMsg,aTipo){
+return new SelectOptionTask(aId,xPath,value,aMsg,aTipo);
 }
 
-BPManager.prototype.createTextAreaTask = function(aId,xPath,value,aMsg){
-return new TextAreaTask(aId,xPath,value,aMsg);
+BPManager.prototype.createTextAreaTask = function(aId,xPath,value,aMsg,aTipo){
+return new TextAreaTask(aId,xPath,value,aMsg,aTipo);
 }
 
-BPManager.prototype.createCheckBoxTask = function(aId,xPath,value,aMsg){
-return new CheckBoxTask(aId,xPath,value,aMsg);
+BPManager.prototype.createCheckBoxTask = function(aId,xPath,value,aMsg,aTipo){
+return new CheckBoxTask(aId,xPath,value,aMsg,aTipo);
 }
 
-BPManager.prototype.createRadioTask = function(aId,xPath,value,aMsg){
-return new RadioTask(aId,xPath,value,aMsg);
+BPManager.prototype.createRadioTask = function(aId,xPath,value,aMsg,aTipo){
+return new RadioTask(aId,xPath,value,aMsg,aTipo);
 }
 
 BPManager.prototype.subscribe = function(aPrimitiveTask){ //Este metodo por ahora solo agrega el objeto
