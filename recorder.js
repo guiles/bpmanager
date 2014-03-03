@@ -1,4 +1,4 @@
-//recorder.js
+//recorder.js test
 var JSON_RECORDER = new Array(); //Array de Objetos, variable global para guardar el JSON
 var BPMN = new BPManager(); //Deberia ser Singleton y variable global
 /*
