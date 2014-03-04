@@ -1,6 +1,16 @@
 //recorder.js test
 var JSON_RECORDER = new Array(); //Array de Objetos, variable global para guardar el JSON
 var BPMN = new BPManager(); //Deberia ser Singleton y variable global
+
+//contador para el id
+//var cont = localStorage.getItem('contador');
+//if(cont != null)
+//localStorage.setItem('contador', cont);
+
+//por ahora borro el localStorage
+localStorage.clear();
+localStorage.setItem('contador', 0);
+
 /*
 Eventos que voy a tratar:
 onChange: select, text, textarea
@@ -81,6 +91,14 @@ switch(event.target.nodeName)
 
 			JSON_RECORDER.push(obj);		 
 		    
+
+			var id_cont = parseInt(localStorage.getItem('contador'));
+			
+			var id = id_cont+1;
+			
+			localStorage.setItem(id, JSON.stringify(obj));
+			localStorage.setItem('contador',id);
+
 		    console.debug("Evento SELECT");		  
 		    console.debug(obj);
 
@@ -114,8 +132,15 @@ switch(event.target.nodeName)
 			}
 
 
-			JSON_RECORDER.push(obj);		 
+			JSON_RECORDER.push(obj);		
 			
+			var id_cont = parseInt(localStorage.getItem('contador'));
+			
+			var id = id_cont+1;
+			
+			localStorage.setItem(id, JSON.stringify(obj));
+			localStorage.setItem('contador',id);
+
 			console.debug("Evento INPUT");		  
 			console.debug(obj);		  
 
@@ -130,6 +155,15 @@ switch(event.target.nodeName)
 			
 			JSON_RECORDER.push(obj);		 
 			
+			var id_cont = parseInt(localStorage.getItem('contador'));
+			
+			var id = id_cont+1;
+			
+			localStorage.setItem(id, JSON.stringify(obj));
+			localStorage.setItem('contador',id);
+			console.debug(id);
+
+
 			console.debug("Evento TextArea");		  
 			console.debug(obj);		  
 
@@ -265,16 +299,37 @@ console.debug("Init");
 
 	function PlayProcedure(){
 		console.log("Ejecuta estas tareas");
-		console.debug(JSON_RECORDER);
-
+		//console.debug(JSON_RECORDER);
+		
+		console.debug(localStorage);
+		
 		//Clear Tasks
 		BPMN.clearPrimitiveTasks();
-		for (var i=0;i < JSON_RECORDER.length;i++){
+		//for (var i=0;i < JSON_RECORDER.length;i++){
+		/*for (var i=0;i < localStorage.length;i++){
 		//Tengo que saber que tipo de elemento para saber que agregar
 		BPMN.addPrimitiveTask(i,JSON_RECORDER[i].type,JSON_RECORDER[i].xPath,
 			JSON_RECORDER[i].value,JSON_RECORDER[i].tipo);
 
 		BPMN.start();
+		}*/
+
+		for (var i=0;i < localStorage.length;i++){
+			//console.debug(localStorage[i]);
+
+			var key = localStorage.key(i);
+    		var value = localStorage[key];
+			console.debug(JSON.parse(value).type);
+
+			var tasks = JSON.parse(value);
+			if(tasks.type != 'undefined'){
+				//Tengo que saber que tipo de elemento para saber que agregar
+				BPMN.addPrimitiveTask(i,tasks.type,tasks.xPath,
+				tasks.value,tasks.tipo);
+			}
+		BPMN.start();
 		}
+
+
 	}
 }
