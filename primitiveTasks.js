@@ -24,10 +24,12 @@ PrimitiveTask.prototype.execute = function(){
     var iterator = document.evaluate(this.xPath,document,null,0,null);
     var node = iterator.iterateNext();
     //Supongo que todas las tareas son manuales ( o sea, ingreso valor)
-    
-    
-    if(this.tipo == 0){ //Si es Manual, pide valor
+ console.debug(node);
+   
+    if(this.tipo == 1){ //Si es Manual, pide valor
 
+            node.focus();
+            //node.style.color = "red";
             var value = prompt("Ingrese Valor","");
             node.value= value;
 

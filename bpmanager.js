@@ -118,9 +118,11 @@ BPManager.prototype.execute = function(){ //Este no lo uso
 }
 
 BPManager.prototype.start = function(){
+//	console.debug(this.currentPrimitiveTasks);
 	
 	if(this.currentPrimitiveTasks.length > 0)
 	this.currentPrimitiveTasks[0].execute();
+
 	
 }
 //END BPMANAGER
