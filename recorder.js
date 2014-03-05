@@ -1,6 +1,10 @@
-//recorder.js test
-var JSON_RECORDER = new Array(); //Array de Objetos, variable global para guardar el JSON
+
+//recorder.js
+
+
+//var JSON_RECORDER = new Array(); //Array de Objetos, variable global para guardar el JSON
 var BPMN = new BPManager(); //Deberia ser Singleton y variable global
+
 /*
 Eventos que voy a tratar:
 onChange: select, text, textarea
@@ -51,7 +55,7 @@ function registroEventoChange(event){
 //Temporal, para asignarle si es tarea automatica, deberia ir en la consola
 var tipo = 0;
 
-if( confirm("Tipo de tarea Automatica") ) tipo = 1;
+//if( confirm("Tipo de tarea Automatica") ) tipo = 1;
 
 var el_id = event.target.id;
 var el_value = event.target.value;
@@ -65,7 +69,53 @@ var sxPath = '//*[@id="'+el_id+'"]';
 	var sxPath = createXPathFromElement(event.target) ;
 	console.debug(sxPath);
 }
+function funcion(){
+	//alert(this.id);
+	var temp = localStorage.getItem(this.id);
+	//lo paso a objeto para poder trabajarlo
+	var temp1 = JSON.parse(temp);
+	console.debug(temp1);
+	
+	temp1.tipo = 0;
+	if(this.checked) temp1.tipo = 1;
+	
+	localStorage.setItem(this.id,JSON.stringify(temp1));
+	console.debug(temp1);
+	//alert(this.checked);
+//	localStorage.setItem(1,temp1);
 
+};
+//Funcion temporal para registrar los eventos en el html 
+function writer(id,text){
+
+			var table_consola = document.getElementById("table_consola");
+			
+
+			var tr = document.createElement('tr');   
+
+    		var td1 = document.createElement('td');
+    		var td2 = document.createElement('td');
+			var td3 = document.createElement('td');
+
+    		var text1 = document.createTextNode(text);
+    		var checkbox = document.createElement('input');
+			checkbox.type = "checkbox";
+			checkbox.id = id;
+			checkbox.onchange = funcion;
+			
+			var id_text = document.createTextNode(id);
+
+			td1.appendChild(id_text);
+ 			td2.appendChild(text1);
+    		td3.appendChild(checkbox);
+    		tr.appendChild(td1);
+    		tr.appendChild(td2);
+			tr.appendChild(td3);
+    		
+    		table_consola.appendChild(tr);
+	
+
+}
 
 //Guardo en el JSON compartido que sirve para el recorder.
 //Diferencio los tipos de nodos, ahi le envio el tipo de tarea que recolecto.
@@ -79,8 +129,17 @@ switch(event.target.nodeName)
 			obj.value = el_value;
 			obj.tipo = tipo;
 
-			JSON_RECORDER.push(obj);		 
+			//JSON_RECORDER.push(obj);		 
 		    
+
+			var id_cont = parseInt(localStorage.getItem('contador'));
+			
+			var id = id_cont+1;
+			
+			localStorage.setItem(id, JSON.stringify(obj));
+			localStorage.setItem('contador',id);
+
+			writer(id,JSON.stringify(obj));
 		    console.debug("Evento SELECT");		  
 		    console.debug(obj);
 
@@ -114,8 +173,16 @@ switch(event.target.nodeName)
 			}
 
 
-			JSON_RECORDER.push(obj);		 
+		//	JSON_RECORDER.push(obj);		
 			
+			var id_cont = parseInt(localStorage.getItem('contador'));
+			
+			var id = id_cont+1;
+			
+			localStorage.setItem(id, JSON.stringify(obj));
+			localStorage.setItem('contador',id);
+			writer(id,JSON.stringify(obj));
+
 			console.debug("Evento INPUT");		  
 			console.debug(obj);		  
 
@@ -128,8 +195,18 @@ switch(event.target.nodeName)
 			obj.value = el_value;
 			obj.tipo = tipo;
 			
-			JSON_RECORDER.push(obj);		 
+			//JSON_RECORDER.push(obj);		 
 			
+			var id_cont = parseInt(localStorage.getItem('contador'));
+			
+			var id = id_cont+1;
+			
+			localStorage.setItem(id, JSON.stringify(obj));
+			localStorage.setItem('contador',id);
+			console.debug(id);
+			
+			writer(id,JSON.stringify(obj));
+ 			
 			console.debug("Evento TextArea");		  
 			console.debug(obj);		  
 
@@ -166,8 +243,8 @@ var el_value = event.target.value;
 
 
 
-window.onload = function(){
 
+window.onload = function(){
 //Recorder.js
 
 	//Inserto el DIV al final del HTML
@@ -218,6 +295,10 @@ window.onload = function(){
 	
 	body.appendChild(div_recorder); 
 
+
+
+
+
 // Agrego Listeners para los botones
 iRecord_recorder.addEventListener("click",RecordManager, false); 
 iStop_recorder.addEventListener("click",RecordManager, false); 
@@ -265,16 +346,151 @@ console.debug("Init");
 
 	function PlayProcedure(){
 		console.log("Ejecuta estas tareas");
-		console.debug(JSON_RECORDER);
-
+		//console.debug(JSON_RECORDER);
+		
+		console.debug(localStorage);
+		
 		//Clear Tasks
 		BPMN.clearPrimitiveTasks();
-		for (var i=0;i < JSON_RECORDER.length;i++){
+		//for (var i=0;i < JSON_RECORDER.length;i++){
+		/*for (var i=0;i < localStorage.length;i++){
 		//Tengo que saber que tipo de elemento para saber que agregar
 		BPMN.addPrimitiveTask(i,JSON_RECORDER[i].type,JSON_RECORDER[i].xPath,
 			JSON_RECORDER[i].value,JSON_RECORDER[i].tipo);
 
 		BPMN.start();
+		}*/
+
+		for (var i=0;i < localStorage.length;i++){
+			//console.debug(localStorage[i]);
+
+
+			var key = localStorage.key(i);
+    		var value = localStorage[key];
+			//console.debug(JSON.parse(value).type);
+
+			var tasks = JSON.parse(value);
+			
+			if(tasks.type){
+				//Tengo que saber que tipo de elemento para saber que agregar
+				BPMN.addPrimitiveTask(i,tasks.type,tasks.xPath,
+				tasks.value,tasks.tipo);
+				
+			}
+
+			//console.debug(BPMN.currentPrimitiveTasks);
+		
 		}
+		BPMN.start();
+
 	}
+
+
+
+
+	
+//Consola
+//Inserto el DIV al final del HTML
+function funcion_load(){
+
+console.debug(localStorage);
+
+for (var i=0;i < localStorage.length;i++){
+			//console.debug(localStorage[i]);
+
+			var key = localStorage.key(i);
+    		var value = localStorage[key];
+			//console.debug(JSON.parse(value).type);
+
+			var tasks = JSON.parse(value);
+			
+			if(tasks.type){
+				//Tengo que saber que tipo de elemento para saber que agregar
+				BPMN.addPrimitiveTask(i,tasks.type,tasks.xPath,
+				tasks.value,tasks.tipo);
+				var table_consola = document.getElementById("table_consola");
+			
+
+			var tr = document.createElement('tr');   
+
+    		var td1 = document.createElement('td');
+    		var td2 = document.createElement('td');
+			var td3 = document.createElement('td');
+
+    		var text1 = document.createTextNode(value);
+    		var checkbox = document.createElement('input');
+			checkbox.type = "checkbox";
+			checkbox.id = key;
+			//checkbox.onchange = funcion;
+			
+			var id_text = document.createTextNode(key);
+
+			td1.appendChild(id_text);
+ 			td2.appendChild(text1);
+    		td3.appendChild(checkbox);
+    		tr.appendChild(td1);
+    		tr.appendChild(td2);
+			tr.appendChild(td3);
+    		
+    		table_consola.appendChild(tr);
+			}	
+		}
+};
+
+
+
+//localStorage.clear();
+//Si el localStorage esta inicializado muestro contenido
+if(localStorage.getItem('1') != null){
+alert('Hay tareas guardadas - clic en Load');
+console.debug(localStorage);
+
+
+} 
+//if(cont != null)
+//localStorage.setItem('contador', cont);
+
+
+//por ahora borro el localStorage
+//localStorage.clear();
+localStorage.setItem('contador', 0);
+
+	var div_consola = document.createElement("div");
+	div_consola.setAttribute('id','div_consola');
+	var hr = document.createElement("hr");
+	div_consola.appendChild(hr);
+
+		/*	var save = document.createElement('input');
+			save.type = "button";
+			save.value = "Save";
+			save.id = "save";
+			save.onclick = funcion_save;*/
+
+	var load = document.createElement('input');
+			load.type = "button";
+			load.value = "Load";
+			load.id = "load";
+			load.onclick = funcion_load;
+
+		var clear = document.createElement('input');
+			clear.type = "button";
+			clear.value = "Clear";
+			clear.id = "clear";
+			clear.onclick = function(){
+				localStorage.clear(); localStorage.setItem('contador', 0); document.getElementById("table_consola").innerHTML = "";
+			 };
+
+	var table = document.createElement('table');
+	table.setAttribute('id','table_consola');
+	div_consola.appendChild(table);		
+	body.appendChild(load);
+	body.appendChild(clear);
+	body.appendChild(div_consola); 
+
+//Fin Consola
+
+
+
+
+
 }
