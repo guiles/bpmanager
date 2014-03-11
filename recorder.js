@@ -85,6 +85,35 @@ function funcion(){
 //	localStorage.setItem(1,temp1);
 
 };
+
+//Hago el overlay aca, despues lo tengo que hacer 
+    function overlay(x) {
+    el = document.getElementById("div_overlay");
+    el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+    console.debug(x);
+    //var table_consola = document.getElementById("table_consola");
+    //console.debug(table_consola);
+    if(el.style.visibility == "visible"){
+
+    var table_consola = document.getElementById("table_consola");
+    console.debug(table_consola);
+    console.debug(x.cells);
+    var table1_id = document.getElementById("table1_id");
+
+    table_id.rows[0].cells[1].firstChild.value = x.cells[1].innerHTML;
+    table_id.rows[0].cells[0].innerHTML = x.cells[0].innerHTML;
+   
+   // var table1_id = document.getElementById("table1_id");
+    //console.debug(table_consola.rows[x.rowIndex].cells);
+    //table_id.rows[0].cells[1].firstChild.value = table_consola.rows[x.rowIndex+1].cells[1].innerHTML;
+    //table_id.rows[0].cells[0].innerHTML = table_consola.rows[x.rowIndex+1].cells[0].innerHTML;
+   
+        }
+    }
+
+
+
+
 //Funcion temporal para registrar los eventos en el html 
 function writer(id,text){
 
@@ -92,7 +121,10 @@ function writer(id,text){
 			
 
 			var tr = document.createElement('tr');   
-
+			tr.id= id;
+			tr.onclick = function(){
+				overlay(this);
+			};
     		var td1 = document.createElement('td');
     		var td2 = document.createElement('td');
 			var td3 = document.createElement('td');
@@ -101,7 +133,8 @@ function writer(id,text){
     		var checkbox = document.createElement('input');
 			checkbox.type = "checkbox";
 			checkbox.id = id;
-			checkbox.onchange = funcion;
+			//checkbox.onchange = funcion;
+			
 			
 			var id_text = document.createTextNode(id);
 
@@ -247,6 +280,9 @@ var el_value = event.target.value;
 window.onload = function(){
 //Recorder.js
 
+
+
+
 	//Inserto el DIV al final del HTML
 	var div_recorder = document.createElement("div");
 
@@ -294,8 +330,85 @@ window.onload = function(){
 	console.debug("Agrego DIV al body");
 	
 	body.appendChild(div_recorder); 
+	
+/*CONSOLA*/
+	
+	var div_consola = document.createElement("div");
+	div_consola.id = "consola"
+	div_consola.style.cssText = "width:100%;height:350px;overflow:auto;";
+
+	var div_consola_header = document.createElement("div");
+	div_consola_header.id = "consola_header"
+	div_consola_header.style.cssText = "background: url('http://yui.yahooapis.com/3.15.0/build/console/assets/skins/sam/bg.png') repeat-x scroll 0 0 #D8D8DA;  border: 1px solid rgba(0, 0, 0, 0); border-top-left-radius: 10px; border-top-right-radius: 10px; padding: 1ex; display:block;";
+
+	var hide_show = document.createElement("input");
+	hide_show.type = "button";
+	hide_show.value = "Show/Hide";
+	hide_show.onclick = function(){ 
+
+	var table_consola = document.getElementById('table_consola');
+	//table_consola.style = "display:none";
+	console.debug(table_consola);
+		if(table_consola.style.display=='block'){
+		table_consola.style.cssText = "display:none";
+		//alert('none');
+		}else{
+		table_consola.style.cssText = "display:block";
+		//alert('block');
+
+		}
+	};
+
+	div_consola_header.appendChild(hide_show);
+
+	var title = document.createTextNode(' Console Log');
+	div_consola_header.appendChild(title);
 
 
+	div_consola.appendChild(div_consola_header); 
+
+	var table_consola = document.createElement("table")
+	table_consola.id = "table_consola"
+	table_consola.style.cssText = "display:block";
+	
+    div_consola.appendChild(table_consola);
+
+	var body = document.getElementsByTagName('body')[0];
+	/*Overlay*/
+
+	/*var div_overlay = document.createElement("div");	
+	div_overlay.id = "overlay";
+	var table_edit = document.createElement("table");	
+	var tr_edit = document.createElement("tr");	
+	var td_id = document.createElement("td");	
+
+	var td_value = document.createElement("td");	
+	var text1 = document.createTextNode("value");
+	td_value.appendChild(text1);
+	tr_edit.appendChild(td_id);
+	tr_edit.appendChild(td_value);
+	table_edit.appendChild(tr_edit);
+	div_overlay.appendChild(table_edit);*/
+	//var table_consola = document.createElement("table")
+	
+/*<div id="overlay">
+
+     <div>
+        <table id="table_id">
+            <tr id="o_1">
+                <td></td>
+                <td><input type="text" value=""> </input> </td>
+            </tr>
+
+        </table>
+     	<a href='#' onclick='overlay()'>close</a>
+        <input type="button" value="Save" onClick="save(this)"></input>
+     </div>*/
+//	div_consola.appendChild(div_overlay);
+	body.appendChild(div_consola); 
+
+
+/**/
 
 
 
@@ -442,7 +555,7 @@ for (var i=0;i < localStorage.length;i++){
 //localStorage.clear();
 //Si el localStorage esta inicializado muestro contenido
 if(localStorage.getItem('1') != null){
-alert('Hay tareas guardadas - clic en Load');
+//alert('Hay tareas guardadas - clic en Load---');
 console.debug(localStorage);
 
 
@@ -455,16 +568,16 @@ console.debug(localStorage);
 //localStorage.clear();
 localStorage.setItem('contador', 0);
 
-	var div_consola = document.createElement("div");
+  var div_consola = document.createElement("div");
 	div_consola.setAttribute('id','div_consola');
 	var hr = document.createElement("hr");
 	div_consola.appendChild(hr);
 
-		/*	var save = document.createElement('input');
+			var save = document.createElement('input');
 			save.type = "button";
 			save.value = "Save";
 			save.id = "save";
-			save.onclick = funcion_save;*/
+			//save.onclick = funcion_save;
 
 	var load = document.createElement('input');
 			load.type = "button";
@@ -483,14 +596,11 @@ localStorage.setItem('contador', 0);
 	var table = document.createElement('table');
 	table.setAttribute('id','table_consola');
 	div_consola.appendChild(table);		
-	body.appendChild(load);
-	body.appendChild(clear);
+	div_recorder.appendChild(load);
+	div_recorder.appendChild(clear);
 	body.appendChild(div_consola); 
 
 //Fin Consola
-
-
-
 
 
 }
