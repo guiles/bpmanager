@@ -96,7 +96,9 @@ add_button.onclick = function(x){
 var id = this.parentNode.parentNode.id;
 var row = this.parentNode.parentNode.sectionRowIndex;
 document.getElementById('table_consola').insertRow(row+1);
-bpm.writer(1,'123',row+1);
+console.debug("agrega tarea!!!");
+bpm.console.editRow(null);
+//bpm.writer(1,'123',row+1);
 //overlay1(this);
 };
 var id_text = document.createTextNode(id);
@@ -413,36 +415,44 @@ save_edit.type = "button";
 save_edit.value = "Save";
 save_edit.onclick = function(){ 
   
-   var table_edit = document.getElementById("table_edit");
-       
-   el = document.getElementById("div_overlay1");
-   el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
-     //  console.debug(table_id.rows[1].cells[2].firstChild.value);
+      //Escondo el div
+      el = document.getElementById("div_overlay1");
+      el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+      //Traigo los datos de la tarea ( Edit o Add)
+      var table_edit = document.getElementById("table_edit");
+      var id = table_edit.rows[0].cells[1].innerHTML;
+       //Temp, si no tiene id creo el objeto, deberia hacerlo siempre y no usar la variable String
+     if(id==''){ 
+      console.debug('Tengo que armar el objeto json con los datos que tengo');
+         
+       //Traigo el contador
+        var con = localStorage.setItem('contador');
+        id = con++;
 
-       var id = table_edit.rows[0].cells[1].innerHTML;
-      // var string = table_id.rows[1].cells[1].firstChild.value;
-       var string = table_edit.rows[1].cells[2].firstChild.value;
-       var input_value = table_edit.rows[1].cells[1].firstChild.value; 
-       var checked = table_edit.rows[2].cells[1].firstChild.checked;
-       var obj =  JSON.parse(string);
-       obj.tipo = (checked)? 1 : 0;
-       obj.value = input_value; 
-        //obj.tipo = checked; 
-       console.debug(obj);
-       var value = JSON.stringify(obj);
+        var obj1 = new Object();
+        obj1.type = "TextAreaTask";
+        obj1.xPath  = 'sxPath';
+        obj1.value = 'el_value';
+        obj1.tipo = 1;
+    var obj_value = JSON.stringify(obj1);
+     }else{
+      var string = table_edit.rows[1].cells[2].firstChild.value;
+      var input_value = table_edit.rows[1].cells[1].firstChild.value; 
+      var checked = table_edit.rows[2].cells[1].firstChild.checked;
+      var obj =  JSON.parse(string);
+      obj.tipo = (checked)? 1 : 0;
+      obj.value = input_value; 
+      var obj_value = JSON.stringify(obj);
        
-     // JSON.stringify(obj)
-      // console.debug(id);                                                                                                                                                                                                        
-       //console.debug(value);
-       
-       localStorage.setItem(id,value);
-       
-
+     }  
+ 
+    
+       localStorage.setItem(id,obj_value);
+      
        var tr = document.getElementById(id);
-      // console.debug(tr);
        tr.cells[0].innerHTML = id;
        tr.cells[1].innerHTML = value;
-
+      
 
 };
 
@@ -510,16 +520,20 @@ bpm.console.editRow = function(x) {
    //el1 = document.getElementById("div_overlay1");
    el = document.getElementById("div_overlay1");
    el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
-  
-    var table_row = x.parentNode.parentNode;   
-    var string = table_row.cells[1].innerHTML;
-    var obj = JSON.parse(string);
-    var table_edit = document.getElementById("table_edit");
-    console.debug(table_edit.rows);
-    table_edit.rows[0].cells[1].innerHTML = table_row.cells[0].innerHTML;
-    table_edit.rows[1].cells[2].firstChild.value = table_row.cells[1].innerHTML;
-    table_edit.rows[1].cells[1].firstChild.value = obj.value;
+  if(x == null){
+   // console.debug("agrega la tarea loquillo");
 
+  }else{
+        var table_row = x.parentNode.parentNode;   
+        var string = table_row.cells[1].innerHTML;
+        var obj = JSON.parse(string);
+        var table_edit = document.getElementById("table_edit");
+       // console.debug(table_edit.rows);
+
+        table_edit.rows[0].cells[1].innerHTML = table_row.cells[0].innerHTML;
+        table_edit.rows[1].cells[2].firstChild.value = table_row.cells[1].innerHTML;
+        table_edit.rows[1].cells[1].firstChild.value = obj.value;
+      }
    }
 
 bpm.console.RecordManager =function (e){ //Esto deberia estar dentro del plugin, y desacoplado de la pagina
