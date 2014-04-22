@@ -1,5 +1,5 @@
+////Esto esta mal, la funcion es global
 //primitiveTasks
-
 function PrimitiveTask(id,xPath,value,tipo){ //Constructor
 
 this.tipo = tipo;    
@@ -55,7 +55,9 @@ PrimitiveTask.prototype.finalizo = function(){
 	document.dispatchEvent(event);
 }
 
+
 //Herencia --> PrimitiveTask
+
 function FillInputTask(id,xPath,value,tipo){
     PrimitiveTask.call(this,id,xPath,value,tipo);
     this.msg = "FillInputTask";
@@ -115,3 +117,6 @@ function TextAreaTask(id,xPath,value,tipo){
 }
 TextAreaTask.prototype = new PrimitiveTask();
 
+module.exports.PrimitiveTask = new PrimitiveTask();
+module.exports.FillInputTask = new FillInputTask();
+module.exports.TextAreaTask = new TextAreaTask();

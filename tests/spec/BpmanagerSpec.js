@@ -6,39 +6,35 @@ describe("BPManager", function() {
     
     beforeEach(function() {
 
-        bpmanager = new BPManager();
+        bpmanager = TESIS.Manager;
         
     });
  
     it("Verifico que este creado", function() {
 		
 	    	expect( bpmanager ).toBeDefined();
+            console.log(bpmanager);
 	        
     });
 
     it("Apenas lo creo el listado de tareas tiene que estar vacio", function() {
         
-        expect( bpmanager.currentPrimitiveTasks.length ).toBe(0);
+        expect( bpmanager.getCurrentPrimitiveTasks().length ).toBe(0);
     });
     
-
-    it("Apenas lo creo el listado de tareas tiene que estar vacio", function() {
-        
-        expect( bpmanager.currentPrimitiveTasks.length ).toBe(0);
-    });
-
 
     it("Suscribo una tarea FillInput al Manager", function() {
         
         bpmanager.addPrimitiveTask(0,'FillInputTask','','');
-        expect( bpmanager.currentPrimitiveTasks.length ).toBe(1);
-        expect( bpmanager.currentPrimitiveTasks[0].msg ).toBe('FillInputTask');
+        console.debug(bpmanager.getCurrentPrimitiveTasks());
+        expect( bpmanager.getCurrentPrimitiveTasks().length ).toBe(1);
+        expect( bpmanager.getCurrentPrimitiveTasks()[0].msg ).toBe('FillInputTask');
     });
 
 	it("Vacio la lista de tareas", function() {
         
-        bpmanager.clearPrimitiveTasks();
-        expect( bpmanager.currentPrimitiveTasks.length ).toBe(0);
+        bpmanager.clearCurrentPrimitiveTasks();
+        expect( bpmanager.getCurrentPrimitiveTasks().length ).toBe(0);
         
     });
 

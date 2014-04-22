@@ -16,10 +16,10 @@ function executeNext(e) {
      task.execute();
 }
 
+//Module Pattern - 
 
-
-//Prototipo BPMANAGER - Parecido al patron Observer
-function BPManager(){ 
+//Prototipo BPMANAGER - Parecido al patron Observer 
+var bpmanager = function BPManager(){ 
 this.currentPrimitiveTasks = []; //Array de las tareas a realizar cuando se ejecuta el Manager
 this.primitiveTasks = ['FillInputTask','SelectOptionTask','TextAreaTask','CheckBoxTask']; //Un array de tareas que puede realizar
 }
@@ -126,3 +126,28 @@ BPManager.prototype.start = function(){
 	
 }
 //END BPMANAGER
+
+
+
+TESIS.example = (function(){
+
+  var variable1;
+  var variable2;
+  return { 
+    setVariable1: function(value){
+      variable1 = value;
+    }
+    ,setVariable2: function(value){
+      variable2 = value;
+    }
+    ,getVariable1: function(){
+      return variable1;
+    }
+    ,getVariable2: function(){
+      return variable2;
+    } 
+
+    }
+})();
+
+module.exports.bpmanager = bpmanager;

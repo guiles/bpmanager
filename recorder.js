@@ -1,7 +1,8 @@
-var bpm = {};
-bpm.console = {};
-var BPMN = new BPManager(); //Deberia ser Singleton y variable global
 window.onload = function(){
+console.debug(TESIS); //Diagrama de Clases o Prototipos
+//var other = Object.create(TESIS.Manager);
+//console.debug(other);
+//if(other !== TESIS.Manager) console.debug(' no son iguales');
 /*
 Eventos que voy a tratar:
 onChange: select, text, textarea
@@ -10,7 +11,7 @@ onFocus: select, text, textarea
 onSelect: text, textarea
 */
 //Funciones adicionales para sacar el xPath abolsuto
-bpm.createXPathFromElement = function(elm) { 
+TESIS.createXPathFromElement = function(elm) { 
    var allNodes = document.getElementsByTagName('*'); 
    for (segs = []; elm && elm.nodeType == 1; elm = elm.parentNode) 
    { 
@@ -37,7 +38,7 @@ bpm.createXPathFromElement = function(elm) {
    return segs.length ? '/' + segs.join('/') : null; 
 }; 
 
-bpm.lookupElementByXPath = function (path) { 
+TESIS.lookupElementByXPath = function (path) { 
    var evaluator = new XPathEvaluator(); 
    var result = evaluator.evaluate(path, document.documentElement, null,XPathResult.FIRST_ORDERED_NODE_TYPE, null); 
    return  result.singleNodeValue; 
@@ -45,7 +46,7 @@ bpm.lookupElementByXPath = function (path) {
 
 
 //Escribe los eventos en la consola
-bpm.writer = function(id,text,index){
+TESIS.writer = function(id,text,index){
 
 var table_consola = document.getElementById("table_consola");
 
@@ -84,7 +85,7 @@ var edit_button = document.createElement('input');
 edit_button.type = "button";
 edit_button.value = "E";
 edit_button.onclick = function(){
-bpm.console.editRow(this);
+TESIS.Consola.editRow(this);
 };
 
 var add_button = document.createElement('input');
@@ -97,8 +98,8 @@ var id = this.parentNode.parentNode.id;
 var row = this.parentNode.parentNode.sectionRowIndex;
 document.getElementById('table_consola').insertRow(row+1);
 console.debug("agrega tarea!!!");
-bpm.console.editRow(null);
-//bpm.writer(1,'123',row+1);
+TESIS.Consola.editRow(null);
+//TESIS.writer(1,'123',row+1);
 //overlay1(this);
 };
 var id_text = document.createTextNode(id);
@@ -118,7 +119,7 @@ tr.appendChild(td4);
 
 
 //Listener de eventos cuando cambia el foco, recolecta datos relacionados.
-bpm.registroEventoChange = function(event){
+TESIS.registroEventoChange = function(event){
 //Temporal, para asignarle si es tarea automatica, deberia ir en la consola
 var tipo = 0;
 
@@ -133,7 +134,7 @@ var sxPath = '//*[@id="'+el_id+'"]';
 }else{ //Si no tiene ID tengo que ver la manera de sacar el absoluto
 
 console.debug("no tiene id, saco el absoluto, uso el ejemplo de stack");
-var sxPath = bpm.createXPathFromElement(event.target) ;
+var sxPath = TESIS.createXPathFromElement(event.target) ;
 console.debug(sxPath);
 }
 
@@ -160,7 +161,7 @@ var id = id_cont+1;
 localStorage.setItem(id, JSON.stringify(obj));
 localStorage.setItem('contador',id);
 
-bpm.writer(id,JSON.stringify(obj),-1);
+TESIS.writer(id,JSON.stringify(obj),-1);
    console.debug("Evento SELECT");	  
    console.debug(obj);
 
@@ -202,7 +203,7 @@ var id = id_cont+1;
 
 localStorage.setItem(id, JSON.stringify(obj));
 localStorage.setItem('contador',id);
-bpm.writer(id,JSON.stringify(obj),-1);
+TESIS.writer(id,JSON.stringify(obj),-1);
 
 console.debug("Evento INPUT");	  
 console.debug(obj);	  
@@ -226,7 +227,7 @@ localStorage.setItem(id, JSON.stringify(obj));
 localStorage.setItem('contador',id);
 console.debug(id);
 
-bpm.writer(id,JSON.stringify(obj),-1);
+TESIS.writer(id,JSON.stringify(obj),-1);
 
 console.debug("Evento TextArea");	  
 console.debug(obj);	  
@@ -239,7 +240,7 @@ default:
 }
 
 
-bpm.registroEventoClic = function(event){
+TESIS.registroEventoClic = function(event){
 
 console.debug("Registro evento:"+event.target);
 console.debug(event.target);
@@ -254,7 +255,7 @@ var sxPath = '//*[@id="'+el_id+'"]';
 }else{
 
 console.debug("no tiene id, saco el absoluto, uso el ejemplo de stack");
-var sxPath = bpm.createXPathFromElement(event.target) ;
+var sxPath = TESIS.createXPathFromElement(event.target) ;
 console.debug(sxPath);
 
 }
@@ -345,7 +346,7 @@ table_consola.style.cssText = "display:block";
 
 div_consola_header.appendChild(hide_show);
 
-var title = document.createTextNode(' Console Log');
+var title = document.createTextNode(' console Log');
 div_consola_header.appendChild(title);
 
 
@@ -426,7 +427,7 @@ save_edit.onclick = function(){
       console.debug('Tengo que armar el objeto json con los datos que tengo');
          
        //Traigo el contador
-        var con = localStorage.setItem('contador');
+        var con = localStorage.getItem('contador');
         id = con++;
 
         var obj1 = new Object();
@@ -516,7 +517,7 @@ console.debug("Init");
 //var record_button = document.getElementById("stop_record");
 //record_button.addEventListener("click",RecordManager, false); 
 
-bpm.console.editRow = function(x) {
+TESIS.Consola.editRow = function(x) {
    //el1 = document.getElementById("div_overlay1");
    el = document.getElementById("div_overlay1");
    el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
@@ -536,12 +537,12 @@ bpm.console.editRow = function(x) {
       }
    }
 
-bpm.console.RecordManager =function (e){ //Esto deberia estar dentro del plugin, y desacoplado de la pagina
+TESIS.Consola.RecordManager =function (e){ //Esto deberia estar dentro del plugin, y desacoplado de la pagina
 //alert('clic');
 if(e.target.id=="start_record"){
 console.debug("empieza a grabar");
-document.addEventListener("change", bpm.registroEventoChange , false); 
-document.addEventListener("click", bpm.registroEventoClic , false); 
+document.addEventListener("change", TESIS.registroEventoChange , false); 
+document.addEventListener("click", TESIS.registroEventoClic , false); 
 
 var start_record = document.getElementById('start_record');
 start_record.disabled = true;
@@ -551,8 +552,8 @@ stop_record.disabled = false;
 }
 if(e.target.id=="stop_record"){
 console.debug("termino de grabar");
-document.removeEventListener("change", bpm.registroEventoChange , false); 
-document.removeEventListener("click", bpm.registroEventoClic , false); 
+document.removeEventListener("change", TESIS.registroEventoChange , false); 
+document.removeEventListener("click", TESIS.registroEventoClic , false); 
 
 var start_record = document.getElementById('start_record');
 start_record.disabled = false;
@@ -567,56 +568,37 @@ stop_record.disabled = true;
 //play_procedure_button.addEventListener("click",PlayProcedure, false); 
 
 
-bpm.console.PlayProcedure = function(){
-console.log("Ejecuta estas tareas");
-//console.debug(JSON_RECORDER);
+TESIS.Consola.PlayProcedure = function(){
+          console.log("Ejecuta estas tareas");
+
+          for (var i=0;i < localStorage.length;i++){
+
+          var key = localStorage.key(i);
+             	 var value = localStorage[key];
+
+          var tasks = JSON.parse(value);
+
+            if(tasks.type){ 
+            //Tengo que saber que tipo de elemento para saber que agregar
+            TESIS.Manager.addPrimitiveTask(i,tasks.type,tasks.xPath,
+            tasks.value,tasks.tipo);
+            }
+
+          }
+
+          TESIS.Manager.start();
+
+          }
+iRecord_recorder.addEventListener("click",TESIS.Consola.RecordManager, false); 
+iStop_recorder.addEventListener("click",TESIS.Consola.RecordManager, false); 
+iPlay_recorder.addEventListener("click",TESIS.Consola.PlayProcedure, false); 
+
+
+TESIS.muestraLocalStorage = function(){
 
 console.debug(localStorage);
-
-//Clear Tasks
-BPMN.clearPrimitiveTasks();
-//for (var i=0;i < JSON_RECORDER.length;i++){
-/*for (var i=0;i < localStorage.length;i++){
-//Tengo que saber que tipo de elemento para saber que agregar
-BPMN.addPrimitiveTask(i,JSON_RECORDER[i].type,JSON_RECORDER[i].xPath,
-JSON_RECORDER[i].value,JSON_RECORDER[i].tipo);
-
-BPMN.start();
-}*/
-
-for (var i=0;i < localStorage.length;i++){
-//console.debug(localStorage[i]);
-
-
-var key = localStorage.key(i);
-   	 var value = localStorage[key];
-//console.debug(JSON.parse(value).type);
-
-var tasks = JSON.parse(value);
-
-if(tasks.type){
-//Tengo que saber que tipo de elemento para saber que agregar
-BPMN.addPrimitiveTask(i,tasks.type,tasks.xPath,
-tasks.value,tasks.tipo);
-
-}
-
-//console.debug(BPMN.currentPrimitiveTasks);
-
-}
-BPMN.start();
-
-}
-iRecord_recorder.addEventListener("click",bpm.console.RecordManager, false); 
-iStop_recorder.addEventListener("click",bpm.console.RecordManager, false); 
-iPlay_recorder.addEventListener("click",bpm.console.PlayProcedure, false); 
-
-
-bpm.muestraLocalStorage = function(){
-
-console.debug(localStorage);
-console.debug(bpm);
-console.debug(bpm.console);
+console.debug(TESIS);
+console.debug(TESIS.Consola);
 }
 
 
@@ -646,7 +628,7 @@ var load = document.createElement('input');
 load.type = "button";
 load.value = "LS";
 load.id = "load";
-load.onclick = bpm.muestraLocalStorage;
+load.onclick = TESIS.muestraLocalStorage;
 
 var clear = document.createElement('input');
 clear.type = "button";
@@ -676,7 +658,7 @@ var key = localStorage.key(i);
 //console.debug(JSON.parse(value).type);
 
 //var tasks = JSON.parse(value);
-bpm.writer(key,value,-1);
+TESIS.writer(key,value,-1);
 }
 }
 }
