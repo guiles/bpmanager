@@ -1,5 +1,17 @@
+/**
+ * Clases Primitivas
+ *
+ * @module Primitive Tasks
+ */
+
 ////Esto esta mal, la funcion es global
 //primitiveTasks
+ /**
+ * 
+ * PrimitiveTask
+ * @class PrimitiveTask
+ * @constructor
+ */
 function PrimitiveTask(id,xPath,value,tipo){ //Constructor
 
 this.tipo = tipo;    
@@ -10,21 +22,30 @@ this.state = 0;
 this.id = id;
 this.msg = "PrimitiveTask"
 }
-
+/**
+ * 
+ * @method getState
+ */
 PrimitiveTask.prototype.getState = function(){ 
 return this.state;
 }
-
+/**
+ * 
+ * @method setState
+ */
 PrimitiveTask.prototype.setState = function(aState){ 
 this.state= aState;
 }
-
+/**
+ * 
+ * @method execute
+ */
 PrimitiveTask.prototype.execute = function(){
 
     var iterator = document.evaluate(this.xPath,document,null,0,null);
     var node = iterator.iterateNext();
     //Supongo que todas las tareas son manuales ( o sea, ingreso valor)
- console.debug(node);
+    console.debug(node);
    
     if(this.tipo == 1){ //Si es Manual, pide valor
 
@@ -57,7 +78,12 @@ PrimitiveTask.prototype.finalizo = function(){
 
 
 //Herencia --> PrimitiveTask
-
+/**
+ * 
+ * FillInputTask
+ * @class FillInputTask
+ * @extends PrimitiveTask
+ */
 function FillInputTask(id,xPath,value,tipo){
     PrimitiveTask.call(this,id,xPath,value,tipo);
     this.msg = "FillInputTask";
@@ -65,6 +91,12 @@ function FillInputTask(id,xPath,value,tipo){
 FillInputTask.prototype = new PrimitiveTask();
 
 //Herencia --> PrimitiveTask : En este caso sobreescribo el metodo ejecutar porque tiene distinto comportamiento
+/**
+ * 
+ * CheckBoxTask
+ * @class CheckBoxTask
+ * @constructor
+ */
 function CheckBoxTask(id,xPath,value,tipo){
     PrimitiveTask.call(this,id,xPath,value,tipo);
     this.msg = "CheckBoxTask";
@@ -117,6 +149,6 @@ function TextAreaTask(id,xPath,value,tipo){
 }
 TextAreaTask.prototype = new PrimitiveTask();
 
-module.exports.PrimitiveTask = new PrimitiveTask();
-module.exports.FillInputTask = new FillInputTask();
-module.exports.TextAreaTask = new TextAreaTask();
+//module.exports.PrimitiveTask = new PrimitiveTask();
+//module.exports.FillInputTask = new FillInputTask();
+//module.exports.TextAreaTask = new TextAreaTask();

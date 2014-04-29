@@ -1,153 +1,124 @@
 //bpmanager.js
-// Registro el Listener de "tarea finalizada"
+//var document = window.document;
 document.addEventListener("taskFinished", executeNext, false);
-
 // Metodo que selecciona tareas del array del Manager
 // y las ejecuta secuencialmente
 function executeNext(e) {
-	var taskId = e.detail.taskId;
-
+	//var taskId = e.detail.taskId;
 	console.debug("Evento: "+e.currentTarget.nodeName+", "
 	+e.detail.time.toLocaleString()+": "+e.detail.message);
-
 	//Busca la tarea y la pone como lista y ejecuta la proxima tarea
 	//Esto es una variable global
-     var task =   BPMN.getNextTask();
-     task.execute();
+    // var task = TESIS.Manager.getNextTask();
+    // task.execute();
+    TESIS.Manager.getNextTask().execute();
 }
+//Module y Factory Pattern 
+TESIS.Manager = (function () {
+	"use strict";
+    var currentPrimitiveTasks = []; //Array de las tareas a realizar cuando se ejecuta el Manager
+    var primitiveTasks = ['FillInputTask','SelectOptionTask','TextAreaTask','CheckBoxTask']; //Un array de tareas que puede realizar
 
-//Module Pattern - 
+        function subscribe(aPrimitiveTask){ //Este metodo por ahora solo agrega el objeto 
+         currentPrimitiveTasks.push(aPrimitiveTask);
+        }
 
-//Prototipo BPMANAGER - Parecido al patron Observer 
-var bpmanager = function BPManager(){ 
-this.currentPrimitiveTasks = []; //Array de las tareas a realizar cuando se ejecuta el Manager
-this.primitiveTasks = ['FillInputTask','SelectOptionTask','TextAreaTask','CheckBoxTask']; //Un array de tareas que puede realizar
-}
+        function createFillInputTask(aId,xPath,value,aMsg,aTipo){
+        return  new FillInputTask(aId,xPath,value,aMsg,aTipo);
+        }
+        function createSelectOptionTask(aId,xPath,value,aMsg,aTipo){
+        return new SelectOptionTask(aId,xPath,value,aMsg,aTipo);
+        }
 
-//El metodo initialize agrega al array de tareas primitivas
-BPManager.prototype.initialize =  function(){
+        function createTextAreaTask(aId,xPath,value,aMsg,aTipo){
+        return new TextAreaTask(aId,xPath,value,aMsg,aTipo);
+        }
 
-}
+        function createCheckBoxTask(aId,xPath,value,aMsg,aTipo){
+        return new CheckBoxTask(aId,xPath,value,aMsg,aTipo);
+        }
 
-BPManager.prototype.getNextTask = function(){ //Me trae la proxima tarea pendiente
-    for (var i=0;i < this.currentPrimitiveTasks.length;i++){
-       
-        if(this.currentPrimitiveTasks[i].getState() == 0 ) return this.currentPrimitiveTasks[i];
-    }
-}
+        function createRadioTask(aId,xPath,value,aMsg,aTipo){
+        return new RadioTask(aId,xPath,value,aMsg,aTipo);
+        }
+        
+    	return {
+      
+           	getNextTask : function(){ //Me trae la proxima tarea pendiente
+           		var i;
+            	for (i=0;i < currentPrimitiveTasks.length;i=i+1){
+                       if(currentPrimitiveTasks[i].getState() === 0 ) { return currentPrimitiveTasks[i]; }
+            	}
+        	}
+            
+            ,execute: function(){ //Este no lo uso
+            	var i;
+                for (i=0;i < currentPrimitiveTasks.length;i=i+1){
+                currentPrimitiveTasks[i].execute();
+                }
+        	} 
+        	,start: function(){
+                if(currentPrimitiveTasks.length > 0){currentPrimitiveTasks[0].execute();}
+                currentPrimitiveTasks[0].execute();
+        	}       
+        	,clearCurrentPrimitiveTasks: function(){
+                currentPrimitiveTasks=[];
+        	}
+        	,addPrimitiveTask :  function(aId,aPrimitiveTaskType,xPath,value,msg,tipo){
+            //Este metodo reemplaza al switch
+	    	var lookup = 
+	    	{ FillInputTask: createFillInputTask(aId,xPath,value,msg,tipo)
+	    	, SelectOptionTask: createSelectOptionTask(aId,xPath,value,msg,tipo)
+	    	, TextAreaTask: createTextAreaTask(aId,xPath,value,msg,tipo)
+	    	, CheckBoxTask: createCheckBoxTask(aId,xPath,value,msg,tipo) } 
+	    	, def = null ;
 
+	    	lookup[aPrimitiveTaskType] ? subscribe(lookup[aPrimitiveTaskType]) : def();
+		   
+            } 
+        	
+        	,addPrimitiveTaskOld:  function(aId,aPrimitiveTaskType,xPath,value,msg,tipo){
 
-//Este metodo lo que haria es instanciar la clase que corresponde y lo agrega al listado de tareas que va a realizar 
-//el manager una vez que le diga execute.
-BPManager.prototype.addPrimitiveTask =  function(aId,aPrimitiveTaskType,xPath,value,msg,tipo){
+        	//Instancia y agrega al array de tareas
+        	switch(aPrimitiveTaskType)
+        	{
+        	case 'FillInputTask':
+        	  
+        	  subscribe( createFillInputTask(aId,xPath,value,msg,tipo) );
+        	  
+        	break;
 
-		//Instancia y agrega al array de tareas
-		switch(aPrimitiveTaskType)
-		{
-		case 'FillInputTask':
-		  
-		  this.subscribe( this.createFillInputTask(aId,xPath,value,msg,tipo) );
-		  
-		  break;
-		case 'SelectOptionTask':
+        	case 'SelectOptionTask':
 
-		  this.subscribe( this.createSelectOptionTask(aId,xPath,value,msg,tipo) );
+                  subscribe( createSelectOptionTask(aId,xPath,value,msg,tipo) );
 
-		  break;
-		case 'TextAreaTask':
+          	break;
+        	case 'TextAreaTask':
 
-		  this.subscribe( this.createTextAreaTask(aId,xPath,value,msg,tipo) );
+                  subscribe( createTextAreaTask(aId,xPath,value,msg,tipo) );
 
-		  break;  
+          	break;  
 
-		 case 'CheckBoxTask':
+         	case 'CheckBoxTask':
 
-		  this.subscribe( this.createCheckBoxTask(aId,xPath,value,msg,tipo) );
+                   subscribe( createCheckBoxTask(aId,xPath,value,msg,tipo) );
 
-		  break;   
-		  case 'RadioTask':
+          	break;   
+          	case 'RadioTask':
 
-		  this.subscribe( this.createRadioTask(aId,xPath,value,msg,tipo) );
+                  subscribe( createRadioTask(aId,xPath,value,msg,tipo) );
 
-		  break; 
-		  
-		default:
-		  return false;
-		}
+          	break; 
+        	default:
+        	  return false;
+                }
+        	}
+        	,getCurrentPrimitiveTasks: function(){
+        	return currentPrimitiveTasks;
+        	}	
+        //===
+    };
+}());
 
-}
-
-BPManager.prototype.createFillInputTask = function(aId,xPath,value,aMsg,aTipo){
-
-return  new FillInputTask(aId,xPath,value,aMsg,aTipo);
-
-}
-
-BPManager.prototype.createSelectOptionTask = function(aId,xPath,value,aMsg,aTipo){
-return new SelectOptionTask(aId,xPath,value,aMsg,aTipo);
-}
-
-BPManager.prototype.createTextAreaTask = function(aId,xPath,value,aMsg,aTipo){
-return new TextAreaTask(aId,xPath,value,aMsg,aTipo);
-}
-
-BPManager.prototype.createCheckBoxTask = function(aId,xPath,value,aMsg,aTipo){
-return new CheckBoxTask(aId,xPath,value,aMsg,aTipo);
-}
-
-BPManager.prototype.createRadioTask = function(aId,xPath,value,aMsg,aTipo){
-return new RadioTask(aId,xPath,value,aMsg,aTipo);
-}
-
-BPManager.prototype.subscribe = function(aPrimitiveTask){ //Este metodo por ahora solo agrega el objeto
-this.currentPrimitiveTasks.push(aPrimitiveTask);
-}
-
-BPManager.prototype.getPrimitiveTasks = function(){ //Este metodo por ahora solo agrega el objeto
-return this.primitiveTasks;
-}
-
-BPManager.prototype.clearPrimitiveTasks = function(){ 
-this.currentPrimitiveTasks=[];
-}
-
-BPManager.prototype.execute = function(){ //Este no lo uso
-	for (var i=0;i < this.currentPrimitiveTasks.length;i++){
-	this.currentPrimitiveTasks[i].execute();
-	}
-}
-
-BPManager.prototype.start = function(){
-//	console.debug(this.currentPrimitiveTasks);
-	
-	if(this.currentPrimitiveTasks.length > 0)
-	this.currentPrimitiveTasks[0].execute();
-
-	
-}
-//END BPMANAGER
-
-
-
-TESIS.example = (function(){
-
-  var variable1;
-  var variable2;
-  return { 
-    setVariable1: function(value){
-      variable1 = value;
-    }
-    ,setVariable2: function(value){
-      variable2 = value;
-    }
-    ,getVariable1: function(){
-      return variable1;
-    }
-    ,getVariable2: function(){
-      return variable2;
-    } 
-
-    }
-})();
-
-module.exports.bpmanager = bpmanager;
+//module.exports.TESIS.Manager =  TESIS.Manager;
+//var bpmanager = ESIS.Manager;
