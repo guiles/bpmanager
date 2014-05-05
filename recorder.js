@@ -1,4 +1,3 @@
-//Empiezo creando los elementos JS
 /**
  * Tesis Ing. Guillermo A. Caserotto
  *
@@ -197,6 +196,37 @@ var Recorder = {
 	var body = document.getElementsByTagName('body')[0];
 	body.appendChild(div_consola); 
 
+	//Agrego la solapa para mostrar/ocultar
+	var div_pestana = document.createElement("div");
+	div_pestana.id =  "div_pestana"; 
+	div_pestana.style.cssText = "display: inline-block;background: #37abc8;opacity: 0.67;position: fixed;right: 0;bottom: 3.2em;z-index: 100;font-size: 14px;font-family: Helvetica, arial, freesans, clean, sans-serif;" ;
+	
+
+	var input_label = document.createElement("a");
+	input_label.style.cssText ="color: white;display: block;width: 5.1em;padding: 0.3em 0 0.3em 1em;";
+	var ocultar_mostrar = document.createTextNode('show/hide');
+	input_label.appendChild(ocultar_mostrar);
+	input_label.href="#";
+	//input_label.value ="<<<";
+	input_label.id ="toc-label";
+	input_label.onclick = function(){ 
+
+	var div_consola = document.getElementById('div_consola');
+
+	   if(div_consola.style.visibility=='visible'){
+
+		div_consola.style.cssText = "visibility: hidden;opacity: 0; -moz-transition: right 1.4s ease-in-out;";
+
+		}else{
+
+		div_consola.style.cssText = "visibility: visible;opacity: 1;-moz-transition: right 1.4s ease-in-out;";
+
+		}
+	};
+
+	div_pestana.appendChild(input_label);
+
+	body.appendChild(div_pestana); 
 	}
 	/**  
 	* Crea elementos HTML para manejar la edicion del recorder
@@ -320,10 +350,12 @@ var Recorder = {
 		div_overlay.appendChild(table_edit);
 
         var div_consola = document.getElementById('div_consola');
+        div_consola.style.visibility = "hidden";
 		div_consola.appendChild(div_overlay);
 
 		var body = document.getElementsByTagName('body')[0];
 		body.appendChild(div_consola);
+
 
 	}
 	/**  
