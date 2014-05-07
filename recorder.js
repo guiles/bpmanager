@@ -128,6 +128,8 @@ var Recorder = {
 
 	var load = document.createElement('input');
 	load.type = "button";
+//	load.type = "image";
+	//load.src = "./rainbow.gif";
 	load.value = "LS";
 	load.id = "load";
 	load.onclick = function(){  
