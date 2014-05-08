@@ -118,6 +118,7 @@ var Recorder = {
 	iStop_recorder.setAttribute('value','Stop');
 	iStop_recorder.setAttribute('id','stop_record');
 	iStop_recorder.setAttribute('disabled',true);
+	iStop_recorder.setAttribute('hidden',true);
 	iStop_recorder.addEventListener("click", this.clickStop , false); 
 
 	var iPlay_recorder = document.createElement("input");
@@ -126,6 +127,28 @@ var Recorder = {
 	iPlay_recorder.setAttribute('id','play_procedure');
 	iPlay_recorder.addEventListener("click", this.clickPlay , false); 
 
+	var sAddTask = document.createElement('select');
+	sAddTask.setAttribute('id','add_task');
+ 	var j;
+ 	var aOptions=['Add Task','Primitive Task','Augmented Task'];
+	for (j = 0; j < aOptions.length; j = j + 1) {
+		opt = document.createElement('option');
+		opt.value = j;
+		if(j===0){opt.disabled = true;opt.selected = true;} 
+		opt.innerHTML = aOptions[j];
+		sAddTask.appendChild(opt);
+	}
+	sAddTask.addEventListener("change", this.addTask , false); 
+
+
+
+	var iRecord_recorder = document.createElement("input");
+	iRecord_recorder.setAttribute('type','button');
+	iRecord_recorder.setAttribute('value','Record');
+	iRecord_recorder.setAttribute('id','start_record');
+	iRecord_recorder.addEventListener("click",this.clickRecord, false); 
+
+
 	var load = document.createElement('input');
 	load.type = "button";
 //	load.type = "image";
@@ -133,7 +156,7 @@ var Recorder = {
 	load.value = "LS";
 	load.id = "load";
 	load.onclick = function(){  
-								console.debug("Contenido:");
+								console.log("Contenido:");
 								console.debug(localStorage);
 								console.debug("Tamano:");
 								console.debug(localStorage.length);
@@ -156,7 +179,7 @@ var Recorder = {
 
 	var div_consola_header = document.createElement("div");
 	div_consola_header.id = "consola_header"
-	div_consola_header.style.cssText = "background: url('http://yui.yahooapis.com/3.15.0/build/console/assets/skins/sam/bg.png') repeat-x scroll 0 0 #D8D8DA;  border: 1px solid rgba(0, 0, 0, 0); border-top-left-radius: 10px; border-top-right-radius: 10px; padding: 1ex; display:block;";
+	div_consola_header.style.cssText = "background:  #37abc8; opacity: 0.67;  border: 1px solid rgba(0, 0, 0, 0); border-top-left-radius: 10px; border-top-right-radius: 10px; padding: 1ex; display:block;";
 
 	var div_table_consola = document.createElement("div");
 	div_table_consola.id =  "div_table_consola";
@@ -183,13 +206,12 @@ var Recorder = {
 
 	div_consola_header.appendChild(iRecord_recorder);	
 	div_consola_header.appendChild(iStop_recorder);
-	div_consola_header.appendChild(iPlay_recorder);
-	
+	div_consola_header.appendChild(iPlay_recorder);	
 	div_consola_header.appendChild(load);
 	div_consola_header.appendChild(clear);
-	
-	div_consola_header.appendChild(hide_show);
-	
+	//div_consola_header.appendChild(hide_show);
+	div_consola_header.appendChild(sAddTask);
+
 	div_consola.appendChild(div_consola_header); 
 	div_consola.appendChild(div_table_consola);
 
@@ -361,13 +383,150 @@ var Recorder = {
 
 	}
 	/**  
+	* Muestra ventana para agregar una tarea primitiva o un augmenter
+	* @method addTask    
+	*/
+	,addTask: function() {
+		//console.debug();
+		var that = this;
+				var save_task = document.createElement("input");
+				save_task.type = "button";
+				save_task.value = "Save";
+				save_task.onclick = function(){ 
+				//Podria utilizar otro elemento y no el div overlay  <-- borrar 			  		
+			    el = document.getElementById("div_overlay");
+	    		el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+				var temp =  document.getElementById("table_edit");
+			    var array_nodes = temp.childNodes;
+	        	id = localStorage.length + 1;
+
+	        	var obj1 = new Object();
+	        	obj1.type = array_nodes[0].childNodes[1].value;
+	        	obj1.xPath  = array_nodes[1].childNodes[1].value;
+	        	obj1.value = array_nodes[2].childNodes[1].value;
+	        	obj1.tipo = 0; //Tengo que traducir el Yes/No
+	        	var obj_value = JSON.stringify(obj1);
+		       	localStorage.setItem(id,obj_value);
+				that.firstChild.selected = true;
+				Recorder.refresh();
+				};
+		//instancio la vista ... podria sacar de constantes los elementos basicos
+		var add_task = Object.create(inflater);
+		add_task.properties = [{type:'selectElement',specs:{label:"Type",choices: ['FillInputTask', 'TextAreaTask']}},
+		{type:'inputElement',specs:{label:'xPath',valor:"an xPath"}},
+		{type:'inputElement',specs:{label:'Value',valor:"a value for xPath"}}
+		,{type:'selectElement',specs:{label:"Auto",choices: ['Yes', 'No']}}];	
+		
+		//instancio la vista ... podria sacar de constantes los elementos basicos
+		var add_augmenter = Object.create(inflater);
+		add_augmenter.properties = [{type:'selectElement',specs:{label:"Type",choices: ['Augmenter 1', 'Augmenter 2']}},
+		{type:'inputElement',specs:{label:'xPath',valor:"an xPath"}},
+		{type:'inputElement',specs:{label:'Value',valor:"a value for xPath"}}
+		,{type:'selectElement',specs:{label:"Auto",choices: ['Yes', 'No']}}];	
+		
+		//Agrego el augmenter aca, hacer un metodo nuevo y dividir responsabilidades
+		el = document.getElementById("div_overlay");
+        el.style.visibility = "visible";	   
+        var table_edit = document.getElementById("table_edit");
+
+		(this.value === "1") ? view.render(table_edit, add_task.inflate()) : view.render(table_edit, add_augmenter.inflate());
+
+		var close_edit = document.createElement("input");
+		close_edit.type = "button";
+		close_edit.value = "Close";
+		close_edit.onclick = function(){ 
+	  
+		   var close_edit = document.getElementById("table_edit");
+	       
+	 	  el = document.getElementById("div_overlay");
+	 	  el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+	  	  that.firstChild.selected = true;
+	 	};
+	 	//Agrego al final los dos botones
+		table_edit.appendChild(save_task);
+		table_edit.appendChild(close_edit);
+
+		//view.render(div_add, add_task.inflate());
+		//div_add.appendChild(save_task);
+		//div_add.appendChild(close_edit);
+		
+	}
+	/**  
 	* si bien esto es repetir codigo, por ahora lo hago asi hasta que tenga un diseño mas copado, (Ver Imagen del Pizarron)
+	* Este metodo me parece que no va mas, voy a poner codigo de prueba aca
 	* @method Consola.addRow    
 	*/
 	,addRow: function() {
+	var save_edit = document.createElement("input");
+							save_edit.type = "button";
+							save_edit.value = "Save";
+							//Tengo dos comporamientos en este metodo, me parece que tengo que dividirlo, espero a hacer el diseño copado del pizarron
+							save_edit.onclick = function(){ 
+							  	      console.debug('guarda');
+
+							      //Escondo el div
+							      el = document.getElementById("div_overlay");
+							      el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+							      //Traigo los datos de la tarea ( Edit o Add)
+							      var table_edit = document.getElementById("table_edit");
+							      var id = table_edit.rows[0].cells[1].innerHTML;
+							       //Temp, si no tiene id creo el objeto, deberia hacerlo siempre y no usar la variable String
+							     if(id==''){ 
+							      console.debug('Tengo que armar el objeto json con los datos que tengo');
+							        id = localStorage.length + 1;
+
+							        var obj1 = new Object();
+							        obj1.type = "TextAreaTask";
+							        obj1.xPath  = 'sxPath';
+							        obj1.value = 'el_value';
+							        obj1.tipo = 1;
+							        var obj_value = JSON.stringify(obj1);
+							       localStorage.setItem(id,obj_value);
+							     }else{
+							      var string = table_edit.rows[1].cells[2].firstChild.value;
+							      var input_value = table_edit.rows[1].cells[1].firstChild.value; 
+							      var checked = table_edit.rows[2].cells[1].firstChild.checked;
+							      var obj =  JSON.parse(string);
+							      obj.tipo = (checked)? 1 : 0;
+							      obj.value = input_value; 
+							      var obj_value = JSON.stringify(obj);
+
+							      localStorage.setItem(id,obj_value); 
+							     }  
+							 
+							     Recorder.refresh();      
+							};
+
+
+		//instancio la vista ... podria sacar de constantes los elementos basicos
+		var add_task = Object.create(inflater);
+		add_task.properties = [{type:'inputElement',specs:{label:'texto1',valor:"value"}},
+		{type:'inputElement',specs:{label:'texto2',valor:"value2"}}
+		,{type:'selectElement',specs:{label:"texto3",choices: ['Yes', 'No']}}];	
+		
+		
 	   el = document.getElementById("div_overlay");
+       el.style.visibility = "visible";	   
+       var table_edit = document.getElementById("table_edit");
+
+	   view.render(table_edit, add_task.inflate());
+		var close_edit = document.createElement("input");
+		close_edit.type = "button";
+		close_edit.value = "Close";
+		close_edit.onclick = function(){ 
+	  
+		   var close_edit = document.getElementById("table_edit");
+	       
+	 	  el = document.getElementById("div_overlay");
+	 	  el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
+	   
+	 	  }
+        //table_edit.appendChild(save_edit);
+		table_edit.appendChild(close_edit);
+		table_edit.appendChild(save_edit);
+	/*   el = document.getElementById("div_overlay");
 	   el.style.visibility = (el.style.visibility == "visible") ? "hidden" : "visible";
-	  el.style.visibility = "visible";
+	   el.style.visibility = "visible";
 	       // var table_row = x.parentNode.parentNode;   
 	       // var string = table_row.cells[1].innerHTML;
 	       // var obj = JSON.parse(string);
@@ -375,7 +534,7 @@ var Recorder = {
 	        console.debug(table_edit);
 	        table_edit.rows[0].cells[1].innerHTML = "";
 	        table_edit.rows[1].cells[2].firstChild.value = "";
-	        table_edit.rows[1].cells[1].firstChild.value = "";
+	        table_edit.rows[1].cells[1].firstChild.value = "";*/
 	}
 	/**  
 	* si bien esto es repetir codigo, por ahora lo hago asi hasta que tenga un diseño mas copado, (Ver Imagen del Pizarron)
@@ -404,15 +563,19 @@ var Recorder = {
 	* @method clickRecord   
 	*/
 	,clickRecord: function(){
-	 
-	 console.debug('empieza a grabar');
-     document.addEventListener("change", eventoChange , false); 
-     //document.addEventListener("click", function(){ console.debug('clic');} , false); 
-
+	
      var start_record = document.getElementById('start_record');
-	 start_record.disabled = true;
-     var stop_record = document.getElementById('stop_record');
-     stop_record.disabled = false;
+	 if(start_record.value == "Record"){
+	 console.debug('empieza a grabar');
+	 document.addEventListener("change", eventoChange , false);   
+	 start_record.value = "Stop";
+	 	
+	 }else if(start_record.value == "Stop"){
+	 console.debug("termino de grabar");	
+     start_record.value = "Record" ;
+     document.removeEventListener("change", eventoChange, false); 
+	 }  
+     
 	}
 	/**  
 	* Para de grabar 
@@ -470,8 +633,12 @@ var Recorder = {
 		  
 		    var key = localStorage.key(i);
 		    var value = localStorage[key];
+		//Saco solamente el tipo, despues lo puedo sacar por el localStorage <-- borrar
+			
+			var concept = JSON.parse(value).type;
 
-		    this.writer(key,value,-1);
+		    //this.writer(key,value,-1);
+		    this.writer(key,concept,-1);
 		  }
 
 	}
@@ -513,7 +680,7 @@ var Recorder = {
 		Recorder.editRow(this);
 		};
 
-		var add_button = document.createElement('input');
+/*		var add_button = document.createElement('input');
 		add_button.type = "button";
 		add_button.value = "A";
 		add_button.onclick = function(x){
@@ -523,12 +690,12 @@ var Recorder = {
 		console.debug("agrega tarea!!!");
 		Recorder.addRow(null);
 
-		};
+		};*/
 		var id_text = document.createTextNode(id);
 
 		td1.appendChild(id_text);
 		td2.appendChild(text1);
-		td3.appendChild(add_button);
+		//td3.appendChild(add_button);
 		td4.appendChild(edit_button);
 		td5.appendChild(delete_button);
 		tr.appendChild(td1);
@@ -582,6 +749,90 @@ var Recorder = {
 
 	}
   }
-  
+
+	/**
+	* @class selectElement
+	*/
+	var selectElement = {
+	specs:{}
+	,render: function(){
+		var div_select = document.createElement('div');
+		var label = document.createTextNode(this.specs.label);
+	    div_select.appendChild(label);
+		var input = document.createElement('select');
+	          var len = this.specs.choices.length;
+	          for (var i = 0; i < len; i++) {
+	              var option = document.createElement('option');
+	              option.text = this.specs.choices[i];
+	              option.value = this.specs.choices[i];
+	              input.appendChild(option);
+	          }
+	    	div_select.appendChild(input);
+
+	          return div_select;
+	}
+	}
+
+	/**
+	* @class inputElement
+	*/
+
+	var inputElement = {
+	specs:{}
+	,render: function(){
+		//console.debug(this.specs);
+		var div_input = document.createElement('div');
+
+		var label = document.createTextNode(this.specs.label);
+	    div_input.appendChild(label);
+		var input = document.createElement('input');
+	    input.type = 'text';
+	    input.value = this.specs.valor;
+	    div_input.appendChild(input);
+
+	    return div_input;
+	}
+	}
+	/**
+	* @class view
+	*/
+	var view = {
+	      render: function(target, elements) {
+	      	target.innerHTML = "";
+	          for (var i = 0; i < elements.length; i++) {
+	              target.appendChild(elements[i].render());
+	          }
+	      }
+	};
+
+	/**
+	* @class inflater
+	*/
+var inflater = {
+	properties:[]
+	,elements:[]
+	,inflate: function(){
+
+		this.elements = [];
+		for (var i = 0; i < this.properties.length; i++) {
+			//console.debug(i);
+			//console.debug(this.properties[i].type);
+			obj_text = this.properties[i].type;
+
+			var lookup = { inputElement: Object.create(inputElement)
+	 		   	, selectElement: Object.create(selectElement)
+	    	 } , def = null ;
+
+	    	var x = lookup[obj_text] ? lookup[obj_text] : null;
+	    	x.specs = this.properties[i].specs;
+
+             this.elements.push(x);  
+              }
+
+	return this.elements;
+	}
+}
+
+
   Recorder.init();
 };

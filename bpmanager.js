@@ -46,7 +46,7 @@ TESIS.Manager = (function () {
       
            	getNextTask : function(){ //Me trae la proxima tarea pendiente
            		var i;
-            	for (i=0;i < currentPrimitiveTasks.length;i=i+1){
+            	for (i = 0;i < currentPrimitiveTasks.length;i=i+1){
                        if(currentPrimitiveTasks[i].getState() === 0 ) { return currentPrimitiveTasks[i]; }
             	}
         	}
